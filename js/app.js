@@ -1,8 +1,11 @@
 // ==========================================
-// 1. CONFIGURACIÓN DE SEGURIDAD (ACTUALIZADO)
+// 1. CONFIGURACIÓN DE SEGURIDAD
 // ==========================================
+// Asegúrate de que este ID NO tenga espacios antes ni después
 const CLIENT_ID = '607731300939-nmjbu7q2n0k2i7k9sd93fp8nkibg6qcn.apps.googleusercontent.com'; 
-const API_KEY = 'TU_API_KEY_AQUÍ'; // <--- PEGA AQUÍ TU LLAVE QUE EMPIEZA CON "AIza"
+
+// RECUERDA GENERAR LA API KEY EN LA CONSOLA (Empieza con AIza)
+const API_KEY = 'TU_API_KEY_AQUÍ'; 
 
 const DISCOVERY_DOC = "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest";
 const SCOPES = "https://www.googleapis.com/auth/calendar.events";
@@ -185,3 +188,4 @@ function mostrarSeccion(id, btn) {
 
 // Carga Inicial
 actualizarVistas();
+
