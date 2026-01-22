@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Chercha Studios Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <img src="logo.png" alt="Logo" class="main-logo">
+            <div class="brand">
+                <h3>La Chercha</h3>
+                <span>Studio Manager</span>
+            </div>
+        </div>
+        <div class="menu">
+            <button class="menu-item active" onclick="mostrarSeccion('dashboard', this)"><i class="fas fa-home"></i> Dashboard</button>
+            <button class="menu-item" onclick="mostrarSeccion('clientes', this)"><i class="fas fa-users"></i> Clientes</button>
+            <button class="menu-item" onclick="mostrarSeccion('ventas', this)"><i class="fas fa-shopping-cart"></i> Ventas</button>
+            <button class="menu-item" onclick="mostrarSeccion('gastos', this)"><i class="fas fa-wallet"></i> Gastos</button>
+            <button class="menu-item" onclick="mostrarSeccion('citas', this)"><i class="fas fa-calendar-alt"></i> Agenda & Google</button>
+            <button class="menu-item" onclick="mostrarSeccion('fotos', this)"><i class="fas fa-sync"></i> Flujo Fotos</button>
+            <button class="menu-item" onclick="mostrarSeccion('facturacion', this)"><i class="fas fa-file-invoice"></i> Facturas</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section id="dashboard" class="seccion activa">
+            <h2 class="section-title">Dashboard</h2>
+            <div class="cards-grid">
+                <div class="card stat-card"><div class="icon-circle blue"><i class="fas fa-user-plus"></i></div><h4>Clientes</h4><p id="stat-clientes">0</p></div>
+                <div class="card stat-card"><div class="icon-circle green"><i class="fas fa-dollar-sign"></i></div><h4>Ingresos</h4><p id="stat-ingresos">$0</p></div>
+                <div class="card stat-card"><div class="icon-circle red"><i class="fas fa-receipt"></i></div><h4>Gastos</h4><p id="stat-gastos">$0</p></div>
+                <div class="card stat-card"><div class="icon-circle teal"><i class="fas fa-images"></i></div><h4>Fotos</h4><p id="stat-fotos">0</p></div>
+            </div>
+        </section>
+
+        <section id="citas" class="seccion">
+            <h2 class="section-title">Agenda de Sesiones</h2>
+            <div class="card">
+                <div class="google-auth-bar">
+                    <button id="authorize_button" class="btn-google" onclick="handleAuthClick()"><i class="fab fa-google"></i> Vincular Google Calendar</button>
+                    <button id="signout_button" class="btn-danger" onclick="handleSignoutClick()" style="display:none;">Desvincular</button>
+                </div>
+                <div class="form-row">
+                    <select id="selectClienteCita"></select>
+                    <input type="date" id="fechaCita">
+                    <input type="time" id="horaCita">
+                    <button class="btn-primary" onclick="agregarCita()">Agendar</button>
+                </div>
+            </div>
+            <div class="card mt-20">
+                <table class="main-table">
+                    <thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Sync</th><th>Acción</th></tr></thead>
+                    <tbody id="listaCitas"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="clientes" class="seccion">
+            <h2 class="section-title">Gestión de Clientes</h2>
+            <div class="card">
+                <div class="form-row">
+                    <input id="nombreCliente" placeholder="Nombre">
+                    <input id="telefonoCliente" placeholder="Teléfono">
+                    <button class="btn-primary" onclick="agregarCliente()">Guardar</button>
+                </div>
+            </div>
+            <div class="card mt-20">
+                <table class="main-table">
+                    <thead><tr><th>Nombre</th><th>Teléfono</th><th>Acción</th></tr></thead>
+                    <tbody id="listaClientes"></tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section id="facturacion" class="seccion">
+            <h2 class="section-title">Facturación</h2>
+            <div class="card"><select id="selectVentaFactura" onchange="generarFactura()"></select></div>
+            <div id="facturaDetalle" class="mt-20"></div>
+        </section>
+    </main>
+</div>
+
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

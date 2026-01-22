@@ -1,0 +1,44 @@
+:root {
+    --bg-light: #f4f7fe;
+    --sidebar-bg: #1b254b;
+    --primary: #4318ff;
+    --text-main: #1b254b;
+    --shadow: 0px 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--bg-light); margin: 0; color: var(--text-main); }
+.app-container { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 280px; background: var(--sidebar-bg); color: white; padding: 30px 20px; position: fixed; height: 100vh; }
+.sidebar-logo { text-align: center; margin-bottom: 40px; }
+.main-logo { width: 80px; border-radius: 50%; border: 2px solid #38bdf8; margin-bottom: 10px; }
+.menu-item { width: 100%; padding: 15px; background: none; border: none; color: #a3afcf; text-align: left; cursor: pointer; border-radius: 12px; margin-bottom: 10px; font-size: 16px; transition: 0.3s; }
+.menu-item i { margin-right: 15px; }
+.menu-item.active, .menu-item:hover { background: rgba(255,255,255,0.1); color: white; }
+
+/* Content Area */
+.main-content { margin-left: 280px; padding: 40px; width: 100%; }
+.seccion { display: none; }
+.seccion.activa { display: block; }
+.section-title { font-size: 24px; font-weight: 700; margin-bottom: 30px; }
+
+/* Cards & Grid */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; }
+.card { background: white; border-radius: 20px; padding: 25px; box-shadow: var(--shadow); }
+.stat-card { text-align: center; }
+.icon-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 20px; }
+.blue { background: #e7eefb; color: #4318ff; }
+.green { background: #e6f7ed; color: #05cd99; }
+.red { background: #fdebee; color: #ee5d50; }
+
+/* Tables */
+.main-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.main-table th { color: #a3afcf; font-size: 12px; text-transform: uppercase; padding: 15px; text-align: left; }
+.main-table td { padding: 15px; border-top: 1px solid #f4f7fe; font-weight: 500; }
+
+/* Forms & Buttons */
+.form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+input, select { padding: 12px; border: 1px solid #e0e5f2; border-radius: 12px; flex: 1; }
+.btn-primary { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; }
+.btn-google { background: #fff; border: 1px solid #e0e5f2; padding: 10px 20px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; }
