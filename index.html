@@ -3,139 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Chercha Studio - Sistema de Gestión Total</title>
+    <title>La Chercha Studio - Sistema Integral v12</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        
         :root { --chercha-color: #00B5CC; }
         body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
-        
-        .sidebar-link.active { 
-            background-color: #1e293b; 
-            color: var(--chercha-color); 
-            border-right: 4px solid var(--chercha-color);
-        }
-        
+        .sidebar-link.active { background-color: #1e293b; color: var(--chercha-color); border-right: 4px solid var(--chercha-color); font-weight: bold; }
         .tab-content { display: none; height: calc(100vh - 20px); overflow-y: auto; padding: 25px; }
         .tab-content.active { display: block; }
         .accent-chercha { color: var(--chercha-color); }
         .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 1rem; padding: 1.5rem; }
+        .login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 100; display: flex; align-items: center; justify-content: center; }
         
-        /* DISEÑO FACTURA A4 */
-        #factura-pdf {
-            background: white;
-            color: #1e293b;
-            padding: 20mm;
-            width: 210mm;
-            min-height: 297mm;
-            margin: auto;
-            box-sizing: border-box;
-        }
-
-        /* CONFIGURACIÓN DE IMPRESIÓN */
-        @media print {
-            body * { visibility: hidden; }
-            #factura-pdf, #factura-pdf * { visibility: visible; }
-            #factura-pdf { position: absolute; left: 0; top: 0; width: 210mm; margin: 0; padding: 10mm; border: none; }
-            .no-print { display: none !important; }
-        }
-
+        /* Diseño Factura A4 */
+        #factura-pdf { background: white; color: #1e293b; padding: 20mm; width: 210mm; min-height: 297mm; margin: auto; box-sizing: border-box; }
+        
+        @media print { .no-print { display: none !important; } }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
 <body class="flex text-sm">
 
+    <!-- LOGIN -->
+    <div id="login-screen" class="login-screen">
+        <div class="card w-80 text-center space-y-6 shadow-2xl border-cyan-500/30">
+            <div id="login-logo-placeholder">
+                <i class="fas fa-camera-retro fa-3x accent-chercha"></i>
+            </div>
+            <h2 class="text-xl font-bold italic">La Chercha Studio</h2>
+            <input type="password" id="login-pass" placeholder="Contraseña" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 text-center outline-none focus:border-cyan-500">
+            <button onclick="checkLogin()" class="w-full bg-cyan-600 py-3 rounded-xl font-bold text-white uppercase text-xs hover:bg-cyan-500 transition">Entrar al Sistema</button>
+            <p class="text-[9px] text-slate-500 italic">Por defecto: admin123</p>
+        </div>
+    </div>
+
     <!-- SIDEBAR -->
     <div class="w-64 bg-slate-900 h-screen p-6 flex flex-col border-r border-slate-800 no-print shadow-2xl">
-        <div class="mb-8 text-center">
-            <img src="input_file_0.png" alt="Logo" class="w-32 mx-auto mb-2 drop-shadow-lg">
-            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold accent-chercha">Foto • Audio • Video</p>
+        <div class="mb-8 text-center" id="sidebar-logo-display">
+            <i class="fas fa-camera-retro fa-3x accent-chercha"></i>
+            <h1 class="text-xl font-black accent-chercha mt-2">LA CHERCHA</h1>
         </div>
         
-        <nav class="space-y-1 flex-grow overflow-y-auto">
-            <button onclick="showTab('dashboard')" class="sidebar-link active w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800">
-                <i class="fas fa-home mr-3 w-5 text-blue-400"></i> Dashboard
-            </button>
-            <button onclick="showTab('pos')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800">
-                <i class="fas fa-cash-register mr-3 w-5 text-green-400"></i> Punto de Venta
-            </button>
-            <button onclick="showTab('facturacion')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800">
-                <i class="fas fa-file-invoice-dollar mr-3 w-5 text-orange-400"></i> Facturación y NCF
-            </button>
-            <button onclick="showTab('servicios-config')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800">
-                <i class="fas fa-edit mr-3 w-5 text-yellow-500"></i> Catálogo
-            </button>
-            <button onclick="showTab('agenda')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800">
-                <i class="fas fa-calendar-alt mr-3 w-5 text-purple-400"></i> Agenda
-            </button>
-            <button onclick="showTab('produccion')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800">
-                <i class="fas fa-tasks mr-3 w-5 text-teal-400"></i> Producción
-            </button>
+        <nav class="space-y-1 flex-grow overflow-y-auto text-xs">
+            <button onclick="showTab('dashboard')" class="sidebar-link active w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800"><i class="fas fa-home mr-3 w-5 text-blue-400"></i> Dashboard</button>
+            <button onclick="showTab('pos')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800"><i class="fas fa-cash-register mr-3 w-5 text-green-400"></i> Nueva Venta</button>
+            <button onclick="showTab('facturacion')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800"><i class="fas fa-file-invoice-dollar mr-3 w-5 text-orange-400"></i> Facturas / NCF</button>
+            <button onclick="showTab('clientes')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800"><i class="fas fa-users mr-3 w-5 text-cyan-400"></i> Clientes</button>
+            <button onclick="showTab('produccion')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800"><i class="fas fa-tasks mr-3 w-5 text-yellow-500"></i> Mesa de Edición</button>
+            <button onclick="showTab('agenda')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800"><i class="fas fa-calendar-alt mr-3 w-5 text-purple-400"></i> Agenda GCal</button>
+            <button onclick="showTab('inventario')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800 text-red-400"><i class="fas fa-warehouse mr-3 w-5"></i> Inventario</button>
+            <button onclick="showTab('servicios-config')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800 text-teal-400"><i class="fas fa-list-ul mr-3 w-5"></i> Catálogo</button>
+            <button onclick="showTab('config')" class="sidebar-link w-full text-left p-3 rounded-xl transition flex items-center hover:bg-slate-800 text-slate-400"><i class="fas fa-cog mr-3 w-5"></i> Configuración</button>
         </nav>
     </div>
 
-    <!-- CONTENIDO -->
+    <!-- MAIN CONTENT -->
     <div class="flex-grow overflow-hidden relative no-print">
 
         <!-- DASHBOARD -->
         <div id="dashboard" class="tab-content active">
-            <h2 class="text-3xl font-bold mb-8 italic">Resumen de Ventas</h2>
+            <h2 class="text-3xl font-bold mb-8 italic">Panel de Control</h2>
             <div class="grid grid-cols-4 gap-6">
-                <div class="card border-l-4 border-cyan-500 shadow-xl">
-                    <p class="text-slate-400 text-[10px] uppercase font-bold">Total Cobrado</p>
-                    <h3 class="text-3xl font-black accent-chercha" id="dash-ingresos">$0.00</h3>
+                <div class="card border-l-4 border-yellow-500 shadow-lg text-center">
+                    <p class="text-slate-400 text-[10px] uppercase font-bold">Ingresos Reales</p>
+                    <h3 class="text-2xl font-black accent-chercha" id="dash-ingresos">$0.00</h3>
                 </div>
-                <div class="card border-l-4 border-red-500 shadow-xl">
-                    <p class="text-slate-400 text-[10px] uppercase font-bold">Por Cobrar</p>
-                    <h3 class="text-3xl font-black text-red-500" id="dash-deuda">$0.00</h3>
+                <div class="card border-l-4 border-red-500 shadow-lg text-center">
+                    <p class="text-slate-400 text-[10px] uppercase">Cuentas por Cobrar</p>
+                    <h3 class="text-2xl font-black text-red-500" id="dash-deuda">$0.00</h3>
                 </div>
-                <div class="card border-l-4 border-blue-500 shadow-xl">
+                <div class="card border-l-4 border-blue-500 shadow-lg text-center">
                     <p class="text-slate-400 text-[10px] uppercase">Gastos</p>
-                    <h3 class="text-3xl font-black text-blue-500" id="dash-gastos">$0.00</h3>
+                    <h3 class="text-2xl font-black text-blue-400" id="dash-gastos">$0.00</h3>
                 </div>
-                <div class="card border-l-4 border-green-500 shadow-xl">
-                    <p class="text-slate-400 text-[10px] uppercase font-bold">Utilidad Neta</p>
-                    <h3 class="text-3xl font-black text-green-400" id="dash-neta">$0.00</h3>
+                <div class="card border-l-4 border-green-500 shadow-lg text-center">
+                    <p class="text-slate-400 text-[10px] uppercase">Utilidad Neta</p>
+                    <h3 class="text-2xl font-black text-green-400" id="dash-neta">$0.00</h3>
                 </div>
             </div>
         </div>
 
-        <!-- POS -->
+        <!-- POS (VENTA) -->
         <div id="pos" class="tab-content">
             <div class="grid grid-cols-12 gap-6 h-full">
-                <div class="col-span-8">
-                    <h2 class="text-2xl font-bold mb-4 italic">Venta Rápida</h2>
-                    <div id="grid-servicios" class="grid grid-cols-3 gap-4"></div>
+                <div class="col-span-8 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">Nueva Venta</h2>
+                        <input type="text" id="pos-search" oninput="renderCatalogPOS()" placeholder="Buscar producto..." class="bg-slate-800 border border-slate-700 p-2 rounded-lg text-xs w-64 outline-none">
+                    </div>
+                    <div id="grid-servicios" class="grid grid-cols-3 gap-4 overflow-y-auto pr-2"></div>
                 </div>
                 <div class="col-span-4 bg-slate-900 border border-slate-700 rounded-3xl flex flex-col shadow-2xl">
                     <div class="p-5 border-b border-slate-800">
-                        <input type="text" id="pos-cliente" placeholder="Nombre del Cliente" class="w-full bg-transparent border-b border-slate-700 outline-none p-2 text-white italic">
+                        <input type="text" id="pos-cliente" placeholder="Nombre del Cliente" class="w-full bg-transparent border-b border-slate-700 outline-none p-2 italic text-white font-bold">
                     </div>
-                    <div id="pos-carrito" class="flex-grow p-4 space-y-2 overflow-y-auto"></div>
+                    <div id="pos-carrito" class="flex-grow p-4 space-y-3 overflow-y-auto text-xs text-slate-500 text-center italic">Carrito vacío</div>
                     <div class="p-6 bg-slate-800 rounded-b-3xl space-y-4">
-                        <div class="flex justify-between text-2xl font-black italic"><span>TOTAL RD$</span><span id="pos-total" class="accent-chercha">0.00</span></div>
-                        <input type="number" id="pos-abono" oninput="updatePosDebt()" placeholder="Abono hoy" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-green-400 font-bold outline-none text-xl">
-                        <p id="pos-deuda-label" class="text-[10px] text-red-400 font-bold uppercase">Deuda: $0.00</p>
-                        <button onclick="finalizarVenta()" class="w-full bg-chercha py-4 rounded-xl font-black text-white uppercase text-xs shadow-lg">Generar Factura</button>
+                        <div class="flex justify-between text-2xl font-black italic"><span>TOTAL</span><span id="pos-total" class="accent-chercha">0.00</span></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[9px] text-slate-400 uppercase">Efectivo</label>
+                                <input type="number" id="pay-cash" oninput="updatePosDebt()" class="w-full bg-slate-900 border border-slate-700 p-2 rounded-lg text-green-400 font-bold outline-none" value="0">
+                            </div>
+                            <div>
+                                <label class="text-[9px] text-slate-400 uppercase">Transferencia</label>
+                                <input type="number" id="pay-bank" oninput="updatePosDebt()" class="w-full bg-slate-900 border border-slate-700 p-2 rounded-lg text-blue-400 font-bold outline-none" value="0">
+                            </div>
+                        </div>
+                        <p id="pos-deuda-label" class="text-[10px] text-red-400 font-black uppercase text-center tracking-widest">Saldo Pendiente: $0.00</p>
+                        <button onclick="finalizarVenta()" class="w-full bg-chercha py-4 rounded-xl font-black text-black uppercase text-xs shadow-lg">Generar Factura NCF</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- FACTURACIÓN -->
+        <!-- FACTURACIÓN / HISTORIAL -->
         <div id="facturacion" class="tab-content">
-            <h2 class="text-2xl font-bold mb-6 italic underline accent-chercha">Historial y Cobros</h2>
-            <div class="card p-0 overflow-hidden">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-800 text-slate-400 uppercase text-[9px] tracking-widest">
+            <h2 class="text-2xl font-bold mb-6 italic underline accent-chercha">Historial de Comprobantes</h2>
+            <div class="card p-0 overflow-hidden shadow-xl">
+                <table class="w-full text-left text-[11px] text-slate-300">
+                    <thead class="bg-slate-800 text-[9px] uppercase tracking-widest text-slate-400">
                         <tr>
                             <th class="p-4">NCF</th>
                             <th class="p-4">Cliente / Fecha</th>
-                            <th class="p-4">Total</th>
                             <th class="p-4">Deuda</th>
                             <th class="p-4">Estatus</th>
                             <th class="p-4 text-center">Acciones</th>
@@ -146,22 +140,37 @@
             </div>
         </div>
 
-        <!-- CONFIG CATÁLOGO -->
-        <div id="servicios-config" class="tab-content">
-            <h2 class="text-2xl font-bold mb-6 italic">Administrar Catálogo</h2>
-            <div class="grid grid-cols-12 gap-6 h-fit">
-                <div class="col-span-4 card space-y-4">
-                    <input type="hidden" id="edit-id">
-                    <input type="text" id="cat-nombre" placeholder="Nombre Servicio" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
-                    <input type="number" id="cat-precio" placeholder="Precio RD$" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
-                    <button onclick="guardarEnCatalogo()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-xs">Guardar Servicio</button>
+        <!-- CLIENTES -->
+        <div id="clientes" class="tab-content">
+            <div class="grid grid-cols-12 gap-6">
+                <div class="col-span-4 card">
+                    <h4 class="font-bold border-b border-slate-700 pb-2 mb-4">Directorio de Clientes</h4>
+                    <div id="lista-clientes-nombres" class="space-y-2 overflow-y-auto max-h-[500px]"></div>
                 </div>
-                <div class="col-span-8 card p-0 overflow-hidden">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-800 text-slate-400 uppercase text-[9px]"><tr><th class="p-4">Servicio</th><th class="p-4">Precio</th><th class="p-4 text-center">Acciones</th></tr></thead>
-                        <tbody id="lista-catalogo-body"></tbody>
-                    </table>
+                <div class="col-span-8 space-y-6">
+                    <div id="detalle-cliente-card" class="card hidden border-t-4 border-cyan-500">
+                        <div class="flex items-center gap-6 border-b border-slate-700 pb-6 mb-6">
+                            <div id="det-cli-foto-container" class="w-24 h-24 rounded-full overflow-hidden border-2 border-cyan-500 cursor-pointer" onclick="document.getElementById('input-foto-cliente').click()"></div>
+                            <input type="file" id="input-foto-cliente" class="hidden" accept="image/*" onchange="actualizarFotoCliente()">
+                            <div>
+                                <h3 class="text-2xl font-black text-white" id="det-cli-nombre">Nombre</h3>
+                                <p class="text-xs text-slate-500 uppercase">Haga clic en la foto para cambiar</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-[10px] text-yellow-500 uppercase mb-2">Notas / Selección de Fotos</h4>
+                        <textarea id="det-cli-notas" onchange="saveClientInfo()" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl h-32 text-xs" placeholder="Escribe aquí los códigos de las fotos elegidas..."></textarea>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- MESA DE EDICIÓN (PRODUCCIÓN) -->
+        <div id="produccion" class="tab-content">
+            <h2 class="text-2xl font-bold mb-8 italic">Mesa de Edición</h2>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="space-y-4"><h3 class="text-center font-bold text-[10px] uppercase bg-slate-800 p-3 rounded-lg text-yellow-500 border-b-4 border-yellow-500">Pendiente</h3><div id="prod-pendiente" class="space-y-3"></div></div>
+                <div class="space-y-4"><h3 class="text-center font-bold text-[10px] uppercase bg-slate-800 p-3 rounded-lg text-blue-400 border-b-4 border-blue-400">Edición</h3><div id="prod-edicion" class="space-y-3"></div></div>
+                <div class="space-y-4"><h3 class="text-center font-bold text-[10px] uppercase bg-slate-800 p-3 rounded-lg text-green-500 border-b-4 border-green-500">Listos</h3><div id="prod-listo" class="space-y-3"></div></div>
             </div>
         </div>
 
@@ -170,124 +179,110 @@
             <h2 class="text-2xl font-bold mb-6">Agenda de Sesiones</h2>
             <div class="grid grid-cols-2 gap-8">
                 <div class="card space-y-4">
-                    <input type="text" id="age-nombre" placeholder="Cliente" class="w-full bg-slate-800 p-4 rounded-xl outline-none border border-slate-700">
-                    <input type="date" id="age-date" class="w-full bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <button onclick="saveCita()" class="w-full bg-blue-600 py-4 rounded-xl font-bold">Vincular a Google Calendar</button>
+                    <input type="text" id="age-nombre" placeholder="Nombre del Cliente" class="w-full bg-slate-800 p-3 rounded-xl outline-none">
+                    <div class="grid grid-cols-2 gap-4"><input type="date" id="age-fecha" class="bg-slate-800 p-3 rounded-xl border border-slate-700"><input type="time" id="age-hora" class="bg-slate-800 p-3 rounded-xl border border-slate-700"></div>
+                    <textarea id="age-desc" placeholder="Descripción del trabajo..." class="w-full bg-slate-800 p-3 rounded-xl h-20 text-xs"></textarea>
+                    <button onclick="saveCita()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-xs">Agendar y Sync GCal</button>
                 </div>
-                <div id="lista-citas" class="space-y-2"></div>
-            </div>
-        </div>
-        
-        <!-- PRODUCCION KANBAN -->
-        <div id="produccion" class="tab-content">
-            <h2 class="text-2xl font-bold mb-8 italic">Flujo de Producción</h2>
-            <div class="grid grid-cols-3 gap-6">
-                <div><h3 class="bg-slate-800 p-2 text-center text-xs font-bold text-yellow-500 rounded border-b-2 border-yellow-500 mb-4 uppercase">Pendiente</h3><div id="prod-pendiente" class="space-y-3"></div></div>
-                <div><h3 class="bg-slate-800 p-2 text-center text-xs font-bold text-blue-400 rounded border-b-2 border-blue-400 mb-4 uppercase">Edición</h3><div id="prod-edicion" class="space-y-3"></div></div>
-                <div><h3 class="bg-slate-800 p-2 text-center text-xs font-bold text-green-500 rounded border-b-2 border-green-500 mb-4 uppercase">Listo</h3><div id="prod-listo" class="space-y-3"></div></div>
+                <div id="lista-citas" class="space-y-2 overflow-y-auto max-h-[500px]"></div>
             </div>
         </div>
 
-        <!-- GASTOS -->
-        <div id="gastos" class="tab-content"><h2 class="text-2xl font-bold mb-6 text-red-500">Gastos</h2><div class="max-w-md card space-y-4"><input type="text" id="gas-desc" placeholder="Renta, etc" class="w-full bg-slate-800 p-4 rounded-xl outline-none"><input type="number" id="gas-monto" placeholder="Monto $" class="w-full bg-slate-800 p-4 rounded-xl outline-none"><button onclick="addGasto()" class="w-full bg-red-600 py-4 rounded-xl font-bold uppercase text-xs">Registrar</button></div></div>
-        
-        <!-- REPORTES -->
-        <div id="reportes" class="tab-content"><h2 class="text-2xl font-bold mb-8">Reporte Mensual</h2><div id="reporte-mensual-container" class="space-y-4"></div></div>
+        <!-- CATÁLOGO -->
+        <div id="servicios-config" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6">Gestión de Catálogo</h2>
+            <div class="grid grid-cols-12 gap-6">
+                <div class="col-span-4 card space-y-4">
+                    <input type="text" id="cat-nombre" placeholder="Nombre del Producto" class="w-full bg-slate-800 p-3 rounded-xl outline-none">
+                    <textarea id="cat-desc" placeholder="Descripción breve" class="w-full bg-slate-800 p-3 rounded-xl text-xs"></textarea>
+                    <input type="number" id="cat-precio" placeholder="Precio RD$" class="w-full bg-slate-800 p-3 rounded-xl text-yellow-500 font-bold">
+                    <button onclick="guardarEnCatalogo()" class="w-full bg-cyan-600 py-3 rounded-xl font-bold uppercase text-xs">Añadir Servicio</button>
+                </div>
+                <div class="col-span-8 card p-0 overflow-hidden"><table class="w-full text-left text-xs"><tbody id="lista-catalogo-body"></tbody></table></div>
+            </div>
+        </div>
 
+        <!-- CONFIGURACIÓN (RESTAURADA) -->
+        <div id="config" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6 italic accent-chercha">Configuración del Sistema</h2>
+            <div class="grid grid-cols-12 gap-8">
+                <div class="col-span-7 card space-y-4">
+                    <h4 class="font-bold border-b border-slate-700 pb-2">Información de la Empresa</h4>
+                    <input type="text" id="conf-nombre" placeholder="Nombre Comercial" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="text" id="conf-rnc" placeholder="RNC / Cédula" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="text" id="conf-direccion" placeholder="Dirección Física" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="text" id="conf-tel" placeholder="Teléfono" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="password" id="conf-pass" placeholder="Nueva Contraseña de Acceso" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <button onclick="saveSettings()" class="w-full bg-green-600 py-3 rounded-xl font-bold uppercase text-xs">Guardar Cambios</button>
+                </div>
+                <div class="col-span-5 card text-center space-y-6">
+                    <h4 class="font-bold border-b border-slate-700 pb-2">Identidad y Respaldo</h4>
+                    <div id="logo-preview-config" class="w-32 h-32 mx-auto bg-slate-800 rounded-full flex items-center justify-center border-2 border-dashed border-slate-600 overflow-hidden"></div>
+                    <input type="file" id="logo-upload" accept="image/*" class="text-xs mx-auto">
+                    <button onclick="uploadLogo()" class="w-full bg-blue-600 py-2 rounded-xl font-bold text-xs uppercase text-white">Actualizar Logo</button>
+                    <div class="pt-6 border-t border-slate-700 grid grid-cols-2 gap-2">
+                        <button onclick="exportData()" class="bg-slate-700 py-2 rounded-lg text-[9px] uppercase font-bold">Exportar Backup</button>
+                        <button onclick="resetSystem()" class="bg-red-900 py-2 rounded-lg text-[9px] uppercase font-bold">Resetear Todo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- MODAL VISTA PREVIA FACTURA A4 -->
-    <div id="modal-factura" class="fixed inset-0 bg-black/95 hidden z-50 flex flex-col items-center p-10 overflow-y-auto no-print">
-        
-        <!-- BARRA DE ACCIONES DEL MODAL -->
+    <!-- MODAL FACTURA A4 -->
+    <div id="modal-factura" class="fixed inset-0 bg-black/95 hidden z-50 flex flex-col items-center p-10 overflow-y-auto no-print text-black">
         <div class="flex gap-4 mb-6 w-full max-w-4xl justify-center">
-            <button onclick="descargarPDF()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-xs shadow-lg flex items-center gap-2"><i class="fas fa-file-pdf"></i> Guardar PDF</button>
-            <button onclick="window.print()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-xs shadow-lg flex items-center gap-2"><i class="fas fa-print"></i> Imprimir</button>
-            <button onclick="compartirFactura()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-xs shadow-lg flex items-center gap-2"><i class="fas fa-share-alt"></i> Compartir</button>
-            <button onclick="closeFactura()" class="bg-red-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-xs shadow-lg">Cerrar</button>
+            <button onclick="exportToPDF()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-black uppercase text-xs shadow-lg"><i class="fas fa-file-pdf"></i> Guardar PDF</button>
+            <button onclick="window.print()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-black uppercase text-xs shadow-lg"><i class="fas fa-print"></i> Imprimir</button>
+            <button onclick="closeFactura()" class="bg-red-600 text-white px-6 py-3 rounded-xl font-black uppercase text-xs shadow-lg">Cerrar</button>
         </div>
-
-        <!-- HOJA A4 PARA DISEÑO -->
-        <div id="factura-pdf" class="shadow-2xl rounded-sm">
+        <div id="factura-pdf" class="rounded shadow-2xl">
             <div class="flex justify-between items-center border-b-4 border-slate-100 pb-6 mb-8">
-                <div class="flex items-center gap-6">
-                    <img src="input_file_0.png" style="width: 150px;">
-                    <div>
-                        <h1 class="text-3xl font-black text-slate-800 italic">LA CHERCHA STUDIOS</h1>
-                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Fotografía • Audio • Video</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <div class="bg-slate-50 p-4 rounded border-t-4 border-cyan-500">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase">Factura de Consumo (NCF)</p>
-                        <p class="text-2xl font-black text-slate-900" id="f-ncf">--</p>
-                    </div>
-                    <p class="text-[10px] mt-2 font-bold text-slate-600">Fecha: <span id="f-fecha" class="font-normal">--</span></p>
-                </div>
+                <div class="flex items-center gap-6"><div id="factura-logo-container"></div><div><h1 class="text-3xl font-black text-slate-800 italic uppercase" id="f-header-name">LA CHERCHA STUDIOS</h1><p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Fotografía • Audio • Video</p><p class="text-[9px] mt-2 font-bold text-slate-700">RNC: <span id="f-header-rnc">--</span> | TEL: <span id="f-header-tel">--</span></p><p class="text-[9px] text-slate-500 italic" id="f-header-direccion">--</p></div></div>
+                <div class="text-right"><div class="bg-slate-50 p-4 rounded border-t-4 border-cyan-500"><p class="text-[8px] font-bold text-slate-400 uppercase">Comprobante de Consumo (NCF)</p><p class="text-2xl font-black text-slate-900" id="f-ncf">--</p></div><p class="text-[10px] mt-2 font-bold text-slate-600">Fecha: <span id="f-fecha">--</span></p></div>
             </div>
-
-            <div class="mb-10 grid grid-cols-2 gap-10">
-                <div>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase border-b mb-2">Emisor</p>
-                    <p class="text-xs font-bold text-slate-800">LA CHERCHA STUDIO, SRL</p>
-                    <p class="text-[10px] text-slate-600">RNC: 131-99999-9</p>
-                    <p class="text-[10px] text-slate-600">Tel: 829-829-8272</p>
-                </div>
-                <div>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase border-b mb-2">Facturado a</p>
-                    <p class="text-xl font-black text-slate-800 uppercase italic" id="f-cliente">--</p>
-                </div>
-            </div>
-
-            <table class="w-full text-xs mb-10">
-                <thead>
-                    <tr class="bg-slate-100 text-slate-700">
-                        <th class="p-4 text-left font-bold uppercase tracking-widest rounded-l">Descripción</th>
-                        <th class="p-4 text-right font-bold uppercase tracking-widest">Cant.</th>
-                        <th class="p-4 text-right font-bold uppercase tracking-widest rounded-r">Total</th>
-                    </tr>
-                </thead>
-                <tbody id="f-items" class="text-slate-800 border-b border-slate-200"></tbody>
-            </table>
-
-            <div class="flex justify-end mt-10">
-                <div class="w-72 space-y-2">
-                    <div class="flex justify-between text-xs border-b pb-1"><span>Subtotal:</span><span id="f-sub" class="font-bold">0.00</span></div>
-                    <div class="flex justify-between text-xs border-b pb-1"><span>ITBIS (18%):</span><span id="f-itbis" class="font-bold">0.00</span></div>
-                    <div class="flex justify-between text-lg font-black text-slate-900 pt-2 italic"><span>TOTAL RD$:</span><span id="f-total">0.00</span></div>
-                    <div class="flex justify-between text-xs text-green-600 font-bold pt-4"><span>Monto Pagado:</span><span id="f-pagado">0.00</span></div>
-                    <div class="flex justify-between text-sm text-red-600 font-black border-t-2 border-red-100 pt-1 italic bg-red-50 p-1"><span>Balance Pendiente:</span><span id="f-deuda">0.00</span></div>
-                </div>
-            </div>
-
-            <div class="mt-24 pt-10 border-t border-slate-100 text-center">
-                <p class="text-lg font-black text-slate-800 italic">"Gracias por preferir nuestros servicios"</p>
-                <p class="text-[8px] text-slate-400 mt-2 tracking-[0.3em] uppercase font-bold italic">Capturando Momentos • Creando Historias</p>
+            <div class="mb-10"><p class="text-[8px] font-bold text-slate-400 uppercase mb-1 border-b">Facturado a:</p><p class="text-xl font-black text-slate-800 uppercase italic" id="f-cliente">--</p></div>
+            <table class="w-full text-xs mb-10"><thead><tr class="bg-slate-800 text-white"><th class="p-4 text-left font-bold rounded-l italic">Descripción</th><th class="p-4 text-right rounded-r italic">Total</th></tr></thead><tbody id="f-items" class="text-slate-700 border-b border-slate-100 font-bold"></tbody></table>
+            <div class="flex justify-end mt-10"><div class="w-72 space-y-2"><div class="flex justify-between text-lg font-black text-slate-900 pt-2 italic border-b border-black"><span>TOTAL RD$:</span><span id="f-total">0.00</span></div><div class="flex justify-between text-xs text-green-600 font-bold pt-2 italic"><span>Abonado:</span><span id="f-pagado">0.00</span></div><div class="flex justify-between text-sm text-red-600 font-black border-t-2 border-red-100 pt-1 bg-red-50 p-1"><span>Deuda Pendiente:</span><span id="f-deuda">0.00</span></div></div></div>
+            <div class="mt-20 p-4 bg-slate-50 rounded-lg text-[8px] text-slate-600 border border-slate-200">
+                <p class="font-bold uppercase mb-1 italic text-slate-800">Términos y Condiciones:</p>
+                <ul class="list-disc ml-4"><li>No se entregan archivos sin procesar (RAW). Los archivos se guardan por 3 meses.</li><li>"Gracias por preferir nuestros servicios"</li></ul>
             </div>
         </div>
     </div>
 
     <script>
-        // --- BASE DE DATOS Y PERSISTENCIA ---
-        let servicios = JSON.parse(localStorage.getItem('LCS_SERVICIOS_V4')) || [
-            { id: 1, cat: 'foto', nombre: 'Sesión Boda Oro', precio: 600 },
-            { id: 2, cat: 'video', nombre: 'Video Musical 4K', precio: 850 }
-        ];
-        let facturas = JSON.parse(localStorage.getItem('LCS_FACTURAS_V4')) || [];
-        let gastos = JSON.parse(localStorage.getItem('LCS_GASTOS_V4')) || [];
-        let citas = JSON.parse(localStorage.getItem('LCS_CITAS_V4')) || [];
-        let proximoNCF = parseInt(localStorage.getItem('LCS_NCF_V4')) || 1;
+        // --- DATA STORE ---
+        let db = {
+            settings: JSON.parse(localStorage.getItem('LCS_SET_FINAL')) || { name: "LA CHERCHA STUDIOS", rnc: "131-99999-9", tel: "829-829-8272", direccion: "Santo Domingo", logo: "", pass: "admin123" },
+            servicios: JSON.parse(localStorage.getItem('LCS_SER_FINAL')) || [{id:1, nombre: 'Sesión Básica', precio: 500, desc: 'Digital'}],
+            facturas: JSON.parse(localStorage.getItem('LCS_FAC_FINAL')) || [],
+            gastos: JSON.parse(localStorage.getItem('LCS_GAS_FINAL')) || [],
+            citas: JSON.parse(localStorage.getItem('LCS_CIT_FINAL')) || [],
+            inventario: JSON.parse(localStorage.getItem('LCS_INV_FINAL')) || [],
+            clientes: JSON.parse(localStorage.getItem('LCS_CLI_FINAL')) || {},
+            ncf: parseInt(localStorage.getItem('LCS_NCF_FINAL')) || 1
+        };
         let cart = [];
 
-        function saveAll() {
-            localStorage.setItem('LCS_SERVICIOS_V4', JSON.stringify(servicios));
-            localStorage.setItem('LCS_FACTURAS_V4', JSON.stringify(facturas));
-            localStorage.setItem('LCS_GASTOS_V4', JSON.stringify(gastos));
-            localStorage.setItem('LCS_CITAS_V4', JSON.stringify(citas));
-            localStorage.setItem('LCS_NCF_V4', proximoNCF.toString());
+        function save() {
+            localStorage.setItem('LCS_SET_FINAL', JSON.stringify(db.settings));
+            localStorage.setItem('LCS_SER_FINAL', JSON.stringify(db.servicios));
+            localStorage.setItem('LCS_FAC_FINAL', JSON.stringify(db.facturas));
+            localStorage.setItem('LCS_GAS_FINAL', JSON.stringify(db.gastos));
+            localStorage.setItem('LCS_CIT_FINAL', JSON.stringify(db.citas));
+            localStorage.setItem('LCS_INV_FINAL', JSON.stringify(db.inventario));
+            localStorage.setItem('LCS_CLI_FINAL', JSON.stringify(db.clientes));
+            localStorage.setItem('LCS_NCF_FINAL', db.ncf.toString());
         }
 
-        // --- NAVEGACIÓN ---
+        function checkLogin() {
+            if(document.getElementById('login-pass').value === db.settings.pass) {
+                document.getElementById('login-screen').style.display = 'none';
+                init();
+            } else alert("Clave Incorrecta");
+        }
+
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
@@ -296,246 +291,157 @@
             if(id === 'pos') renderCatalogPOS();
             if(id === 'servicios-config') renderCatalogConfig();
             if(id === 'facturacion') renderFacturas();
-            if(id === 'reportes') renderReportes();
+            if(id === 'clientes') renderClientes();
             if(id === 'produccion') renderProduccion();
+            if(id === 'config') loadSettings();
         }
 
-        // --- LÓGICA DE PDF ---
-        function descargarPDF() {
-            const element = document.getElementById('factura-pdf');
-            const ncf = document.getElementById('f-ncf').innerText;
-            const opt = {
-                margin: 0,
-                filename: `Factura_Chercha_${ncf}.pdf`,
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
+        // --- GESTIÓN DE CONFIGURACIÓN ---
+        function loadSettings() {
+            document.getElementById('conf-nombre').value = db.settings.name;
+            document.getElementById('conf-rnc').value = db.settings.rnc;
+            document.getElementById('conf-tel').value = db.settings.tel;
+            document.getElementById('conf-direccion').value = db.settings.direccion;
+            updateLogoUI();
         }
-
-        // --- COMPARTIR ---
-        async function compartirFactura() {
-            const ncf = document.getElementById('f-ncf').innerText;
-            const cliente = document.getElementById('f-cliente').innerText;
-            const total = document.getElementById('f-total').innerText;
-            const texto = `📸 LA CHERCHA STUDIO\nHola ${cliente}, aquí tienes tu factura ${ncf} por un total de RD$ ${total}.\n\n"Gracias por preferir nuestros servicios"`;
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({ title: 'Factura La Chercha', text: texto });
-                } catch (err) { console.log("Error al compartir"); }
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        function saveSettings() {
+            db.settings.name = document.getElementById('conf-nombre').value;
+            db.settings.rnc = document.getElementById('conf-rnc').value;
+            db.settings.tel = document.getElementById('conf-tel').value;
+            db.settings.direccion = document.getElementById('conf-direccion').value;
+            if(document.getElementById('conf-pass').value) db.settings.pass = document.getElementById('conf-pass').value;
+            save(); alert("Cambios guardados"); updateLogoUI();
+        }
+        function uploadLogo() {
+            const r = new FileReader(); r.onloadend = () => { db.settings.logo = r.result; save(); updateLogoUI(); alert("Logo Cargado"); };
+            r.readAsDataURL(document.getElementById('logo-upload').files[0]);
+        }
+        function updateLogoUI() {
+            if(db.settings.logo) {
+                document.getElementById('sidebar-logo-display').innerHTML = `<img src="${db.settings.logo}" class="w-32 mx-auto">`;
+                document.getElementById('logo-preview-config').innerHTML = `<img src="${db.settings.logo}" class="w-full h-full object-cover">`;
+                document.getElementById('factura-logo-container').innerHTML = `<img src="${db.settings.logo}" style="width: 130px;">`;
             }
+            document.getElementById('f-header-name').innerText = db.settings.name;
+            document.getElementById('f-header-rnc').innerText = db.settings.rnc;
+            document.getElementById('f-header-tel').innerText = db.settings.tel;
+            document.getElementById('f-header-direccion').innerText = db.settings.direccion;
         }
 
-        // --- CATALOGO ---
-        function renderCatalogConfig() {
-            const body = document.getElementById('lista-catalogo-body');
-            body.innerHTML = '';
-            servicios.forEach(s => {
-                body.innerHTML += `<tr class="border-b border-slate-800">
-                    <td class="p-4 font-bold text-slate-300 uppercase italic">${s.nombre}</td>
-                    <td class="p-4 font-black accent-chercha">RD$ ${s.precio.toFixed(2)}</td>
-                    <td class="p-4 text-center">
-                        <button onclick="editItem(${s.id})" class="text-blue-400 mx-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteItem(${s.id})" class="text-red-400 mx-2"><i class="fas fa-trash"></i></button>
-                    </td></tr>`;
-            });
-        }
+        // --- CATALOGO & POS ---
         function guardarEnCatalogo() {
-            const n = document.getElementById('cat-nombre').value;
-            const p = parseFloat(document.getElementById('cat-precio').value) || 0;
-            const eid = document.getElementById('edit-id').value;
-            if(!n || p <= 0) return alert('Verifica los datos');
-            if(eid) {
-                let s = servicios.find(i => i.id == eid);
-                s.nombre = n; s.precio = p;
-                document.getElementById('edit-id').value = '';
-            } else {
-                servicios.push({ id: Date.now(), nombre: n, precio: p, cat: 'foto' });
-            }
-            saveAll(); document.getElementById('cat-nombre').value = ''; document.getElementById('cat-precio').value = '';
-            renderCatalogConfig();
+            const n = document.getElementById('cat-nombre').value, d = document.getElementById('cat-desc').value, p = parseFloat(document.getElementById('cat-precio').value) || 0;
+            if(!n || p<=0) return;
+            db.servicios.push({id:Date.now(), nombre:n, desc:d, precio:p}); save(); renderCatalogConfig();
+            document.getElementById('cat-nombre').value=''; document.getElementById('cat-desc').value=''; document.getElementById('cat-precio').value='';
         }
-        function deleteItem(id) { if(confirm('¿Eliminar?')) { servicios = servicios.filter(i => i.id !== id); saveAll(); renderCatalogConfig(); } }
-        function editItem(id) {
-            let s = servicios.find(i => i.id === id);
-            document.getElementById('cat-nombre').value = s.nombre;
-            document.getElementById('cat-precio').value = s.precio;
-            document.getElementById('edit-id').value = id;
+        function renderCatalogConfig() {
+            const b = document.getElementById('lista-catalogo-body'); b.innerHTML = '';
+            db.servicios.forEach(s => b.innerHTML += `<tr class="border-b border-slate-800"><td class="p-3 font-bold">${s.nombre}</td><td class="p-3 text-slate-500">${s.desc}</td><td class="p-3 font-black text-yellow-500">$${s.precio}</td><td class="p-3 text-center"><button onclick="delC(${s.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`);
         }
+        function delC(id) { db.servicios = db.servicios.filter(i => i.id!==id); save(); renderCatalogConfig(); }
 
-        // --- POS ---
         function renderCatalogPOS() {
-            const grid = document.getElementById('grid-servicios');
-            grid.innerHTML = '';
-            servicios.forEach(s => {
-                grid.innerHTML += `<div onclick="addCarrito(${s.id})" class="card cursor-pointer hover:border-cyan-500 transition active:scale-95 shadow-xl border-l-4 border-cyan-500">
-                    <h4 class="font-bold text-xs uppercase italic">${s.nombre}</h4>
-                    <p class="text-lg font-black accent-chercha mt-1">RD$ ${s.precio}</p>
-                </div>`;
+            const grid = document.getElementById('grid-servicios'); grid.innerHTML = '';
+            const query = document.getElementById('pos-search').value.toLowerCase();
+            db.servicios.filter(s => s.nombre.toLowerCase().includes(query)).forEach(s => {
+                grid.innerHTML += `<div onclick="addCarrito(${s.id})" class="card cursor-pointer hover:border-cyan-500 transition shadow-xl border-l-4 border-cyan-500"><h4 class="font-bold text-xs uppercase">${s.nombre}</h4><p class="text-xl font-black accent-chercha mt-1">$${s.precio}</p></div>`;
             });
         }
-        function addCarrito(id) {
-            const s = servicios.find(i => i.id === id);
-            cart.push({...s, uid: Date.now()});
-            renderCart();
-        }
-        function updateItemPrice(uid, val) {
-            cart.find(i => i.uid === uid).precio = parseFloat(val) || 0;
-            renderCartCalc();
-        }
+        function addCarrito(id) { const s = db.servicios.find(i => i.id === id); cart.push({...s, uid: Date.now()}); renderCart(); }
         function renderCart() {
-            const list = document.getElementById('pos-carrito');
-            list.innerHTML = cart.length ? '' : 'Agregue servicios';
-            cart.forEach(i => {
-                list.innerHTML += `<div class="bg-slate-800 p-2 rounded-xl border-l-4 border-cyan-500 text-left flex flex-col gap-1 shadow-md">
-                    <div class="flex justify-between items-center"><span class="text-[9px] font-bold uppercase italic">${i.nombre}</span><button onclick="removeCarrito(${i.uid})" class="text-red-500 text-[10px]"><i class="fas fa-times"></i></button></div>
-                    <div class="flex items-center gap-1"><span class="text-[8px]">Precio:</span><input type="number" value="${i.precio}" onchange="updateItemPrice(${i.uid}, this.value)" class="w-16 bg-slate-900 text-[10px] p-1 rounded font-bold accent-chercha outline-none"></div>
-                </div>`;
-            });
-            renderCartCalc();
+            const list = document.getElementById('pos-carrito'); list.innerHTML = cart.length ? '' : 'Vacío';
+            cart.forEach(i => { list.innerHTML += `<div class="bg-slate-800 p-2 rounded-xl flex justify-between items-center border-l-2 border-yellow-500"><span class="text-[10px] font-bold uppercase truncate">${i.nombre}</span><input type="number" value="${i.precio}" onchange="updP(${i.uid}, this.value)" class="w-14 bg-slate-900 text-[10px] p-1 rounded text-yellow-500"><button onclick="remC(${i.uid})" class="text-red-500"><i class="fas fa-times"></i></button></div>`; });
+            const t = cart.reduce((a, b) => a + b.precio, 0); document.getElementById('pos-total').innerText = t.toFixed(2); updatePosDebt();
         }
-        function removeCarrito(uid) { cart = cart.filter(i => i.uid !== uid); renderCart(); }
-        function renderCartCalc() {
-            const total = cart.reduce((a, b) => a + b.precio, 0);
-            document.getElementById('pos-total').innerText = `${total.toFixed(2)}`;
-            updatePosDebt();
-        }
-        function updatePosDebt() {
-            const t = cart.reduce((a, b) => a + b.precio, 0);
-            const a = parseFloat(document.getElementById('pos-abono').value) || 0;
-            document.getElementById('pos-deuda-label').innerText = `Pendiente: RD$ ${(t-a).toFixed(2)}`;
-        }
+        function updP(uid, v) { cart.find(i => i.uid === uid).precio = parseFloat(v) || 0; renderCart(); }
+        function remC(uid) { cart = cart.filter(i => i.uid !== uid); renderCart(); }
+        function updatePosDebt() { const t = cart.reduce((a, b) => a + b.precio, 0), c = parseFloat(document.getElementById('pay-cash').value) || 0, b = parseFloat(document.getElementById('pay-bank').value) || 0; document.getElementById('pos-deuda-label').innerText = `Saldo Pendiente: RD$ ${(t - (c+b)).toFixed(2)}`; }
 
         function finalizarVenta() {
             const cl = document.getElementById('pos-cliente').value || 'Consumidor Final';
-            if(!cart.length) return alert('Vacío');
-            const total = cart.reduce((a, b) => a + b.precio, 0);
-            const pagado = parseFloat(document.getElementById('pos-abono').value) || 0;
-            const ncf = "B02" + proximoNCF.toString().padStart(8, '0');
-            const f = { ncf, cliente: cl, fecha: new Date().toLocaleString(), fechaObj: new Date(), items: [...cart], total, pagado, deuda: total - pagado, estadoProd: 'pendiente', estatusEntrega: 'En Proceso' };
-            facturas.push(f);
-            proximoNCF++;
-            saveAll();
-            showFacturaModal(f);
-            cart = []; document.getElementById('pos-cliente').value = ''; document.getElementById('pos-abono').value = '';
-            renderCart(); updateDash();
+            if(!cart.length) return;
+            const t = cart.reduce((a, b) => a + b.precio, 0), c = parseFloat(document.getElementById('pay-cash').value) || 0, b = parseFloat(document.getElementById('pay-bank').value) || 0;
+            const ncf = "B02" + db.ncf.toString().padStart(8, '0');
+            const f = { ncf, cliente: cl, fecha: new Date().toLocaleString(), fechaObj: new Date(), items: [...cart], total: t, pagado: c+b, deuda: t-(c+b), estadoProd: 'pendiente', estatusEntrega: 'En Proceso' };
+            db.facturas.push(f); db.ncf++; save(); showFacturaModal(f); cart = []; document.getElementById('pos-cliente').value = ''; document.getElementById('pay-cash').value = '0'; document.getElementById('pay-bank').value = '0'; renderCart(); updateDash();
         }
 
-        // --- HISTORIAL ---
-        function renderFacturas() {
-            const body = document.getElementById('lista-facturas-body');
-            body.innerHTML = '';
-            facturas.slice().reverse().forEach(f => {
-                body.innerHTML += `<tr class="border-b border-slate-800 table-row">
-                    <td class="p-4 font-bold accent-chercha italic">${f.ncf}</td>
-                    <td class="p-4 uppercase"><strong>${f.cliente}</strong><br><span class="text-[8px] text-slate-500 font-normal">${f.fecha}</span></td>
-                    <td class="p-4 font-black">RD$ ${f.total.toFixed(2)}</td>
-                    <td class="p-4 text-red-500 font-bold italic">RD$ ${f.deuda.toFixed(2)}</td>
-                    <td class="p-4">
-                        <select onchange="updateEstatusEntrega('${f.ncf}', this.value)" class="bg-slate-800 text-[9px] rounded p-1 outline-none border border-slate-700">
-                            <option value="En Proceso" ${f.estatusEntrega === 'En Proceso' ? 'selected' : ''}>Proceso</option>
-                            <option value="Digital Entregado" ${f.estatusEntrega === 'Digital Entregado' ? 'selected' : ''}>Digital</option>
-                            <option value="Falta Marco" ${f.estatusEntrega === 'Falta Marco' ? 'selected' : ''}>Marco</option>
-                            <option value="Completado" ${f.estatusEntrega === 'Completado' ? 'selected' : ''}>Final</option>
-                        </select>
-                    </td>
-                    <td class="p-4 text-center flex gap-1 justify-center">
-                        <button onclick="reimprimir('${f.ncf}')" class="bg-slate-700 p-2 rounded text-blue-400"><i class="fas fa-file-pdf"></i></button>
-                        <button onclick="exportarVCF('${f.ncf}')" class="bg-slate-700 p-2 rounded text-green-400"><i class="fas fa-user-plus"></i></button>
-                    </td>
-                </tr>`;
+        // --- CLIENTES ---
+        function renderClientes() {
+            const list = document.getElementById('lista-clientes-nombres'); list.innerHTML = '';
+            const nombres = [...new Set([...db.facturas.map(f => f.cliente), ...Object.keys(db.clientes)])];
+            nombres.forEach(n => {
+                const foto = db.clientes[n]?.foto || "";
+                list.innerHTML += `<button onclick="verHistorialCliente('${n}')" class="w-full flex items-center p-2 bg-slate-800 rounded-xl mb-1 hover:bg-slate-700">
+                    <img src="${foto || 'https://via.placeholder.com/50'}" class="w-8 h-8 rounded-full mr-3 object-cover"><span class="font-bold text-[11px]">${n}</span></button>`;
             });
         }
-        function updateEstatusEntrega(ncf, val) { facturas.find(f => f.ncf === ncf).estatusEntrega = val; saveAll(); }
-
-        // --- AGENDA & SYNC ---
-        function saveCita() {
-            const n = document.getElementById('age-nombre').value;
-            const f = document.getElementById('age-date').value;
-            if(!n || !f) return alert('Faltan datos');
-            citas.push({ n, f }); renderCitas();
-            const gDate = f.replaceAll('-', '');
-            window.open(`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("La Chercha: "+n)}&dates=${gDate}T120000Z/${gDate}T130000Z`, '_blank');
+        function verHistorialCliente(n) { 
+            document.getElementById('detalle-cliente-card').classList.remove('hidden'); document.getElementById('det-cli-nombre').innerText = n;
+            document.getElementById('det-cli-notas').value = db.clientes[n]?.notas || "";
+            const fC = document.getElementById('det-cli-foto-container'); fC.innerHTML = db.clientes[n]?.foto ? `<img src="${db.clientes[n].foto}" class="w-full h-full object-cover rounded-full">` : `<i class="fas fa-user-circle fa-2x mt-6 opacity-10"></i>`; 
         }
-        function renderCitas() {
-            const l = document.getElementById('lista-citas'); l.innerHTML = '';
-            citas.forEach(c => l.innerHTML += `<div class="bg-slate-800 p-3 rounded-xl border border-cyan-900 text-xs font-bold text-cyan-400">${c.n} <br><span class="text-slate-500 text-[10px] italic font-normal">${c.f}</span></div>`);
+        function saveClientInfo() {
+            const n = document.getElementById('det-cli-nombre').innerText; if(!db.clientes[n]) db.clientes[n] = {};
+            db.clientes[n].notas = document.getElementById('det-cli-notas').value; save();
         }
-
-        // --- DASHBOARD ---
-        function updateDash() {
-            const i = facturas.reduce((a, b) => a + b.pagado, 0); const d = facturas.reduce((a, b) => a + b.deuda, 0); const g = gastos.reduce((a, b) => a + b.m, 0);
-            document.getElementById('dash-ingresos').innerText = `RD$ ${i.toFixed(2)}`;
-            document.getElementById('dash-deuda').innerText = `RD$ ${d.toFixed(2)}`;
-            document.getElementById('dash-gastos').innerText = `RD$ ${g.toFixed(2)}`;
-            document.getElementById('dash-neta').innerText = `RD$ ${(i-g).toFixed(2)}`;
+        function actualizarFotoCliente() {
+            const n = document.getElementById('det-cli-nombre').innerText, r = new FileReader();
+            r.onloadend = () => { if(!db.clientes[n]) db.clientes[n]={}; db.clientes[n].foto = r.result; save(); verHistorialCliente(n); renderClientes(); };
+            r.readAsDataURL(document.getElementById('input-foto-cliente').files[0]);
         }
 
+        // --- PRODUCCION ---
+        function renderProduccion() {
+            const p = document.getElementById('prod-pendiente'), e = document.getElementById('prod-edicion'), l = document.getElementById('prod-listo');
+            p.innerHTML = ''; e.innerHTML = ''; l.innerHTML = '';
+            db.facturas.forEach(f => {
+                const card = `<div class="bg-slate-800 p-2 rounded-xl border border-slate-700 shadow-md text-xs mb-2">
+                    <p class="font-bold uppercase">${f.cliente}</p>
+                    <div class="flex justify-between mt-2">
+                        <button onclick="moveStep('${f.ncf}', 'backward')" class="text-slate-500"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="moveStep('${f.ncf}', 'forward')" class="text-cyan-400"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>`;
+                if(f.estadoProd === 'pendiente') p.innerHTML += card; else if(f.estadoProd === 'edicion') e.innerHTML += card; else if(f.estadoProd === 'listo') l.innerHTML += card;
+            });
+        }
+        function moveStep(n, d) {
+            let f = db.facturas.find(i => i.ncf === n); const s = ['pendiente', 'edicion', 'listo']; let i = s.indexOf(f.estadoProd);
+            if(d==='forward' && i<2) f.estadoProd = s[i+1]; if(d==='backward' && i>0) f.estadoProd = s[i-1]; save(); renderProduccion();
+        }
+
+        // --- UTILS ---
         function showFacturaModal(f) {
-            document.getElementById('f-ncf').innerText = f.ncf;
-            document.getElementById('f-fecha').innerText = f.fecha;
-            document.getElementById('f-cliente').innerText = f.cliente;
+            document.getElementById('f-ncf').innerText = f.ncf; document.getElementById('f-fecha').innerText = f.fecha; document.getElementById('f-cliente').innerText = f.cliente;
             const tbody = document.getElementById('f-items'); tbody.innerHTML = '';
-            f.items.forEach(i => tbody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-4 italic uppercase font-bold">${i.nombre}</td><td class="p-4 text-right">1</td><td class="p-4 text-right font-black italic">RD$ ${i.precio.toFixed(2)}</td></tr>`);
-            
-            const itbis = f.total * 0.18;
-            document.getElementById('f-sub').innerText = (f.total - itbis).toFixed(2);
-            document.getElementById('f-itbis').innerText = itbis.toFixed(2);
-            document.getElementById('f-total').innerText = f.total.toFixed(2);
-            document.getElementById('f-pagado').innerText = f.pagado.toFixed(2);
-            document.getElementById('f-deuda').innerText = f.deuda.toFixed(2);
+            f.items.forEach(i => tbody.innerHTML += `<tr class="border-b border-slate-50"><td class="p-3 italic font-bold uppercase">${i.nombre}</td><td class="p-3 text-right font-black italic">RD$ ${i.precio.toFixed(2)}</td></tr>`);
+            document.getElementById('f-total').innerText = f.total.toFixed(2); document.getElementById('f-pagado').innerText = f.pagado.toFixed(2); document.getElementById('f-deuda').innerText = f.deuda.toFixed(2);
             document.getElementById('modal-factura').classList.remove('hidden');
         }
-        function closeFactura() { document.getElementById('modal-factura').classList.add('hidden'); showTab('dashboard'); }
-        function reimprimir(ncf) { showFacturaModal(facturas.find(i => i.ncf === ncf)); }
-
-        // --- OTROS ---
-        function addGasto() {
-            const d = document.getElementById('gas-desc').value; const m = parseFloat(document.getElementById('gas-monto').value) || 0;
-            if(!d || m <= 0) return alert('Invalido');
-            gastos.push({ d, m, fechaObj: new Date() }); updateDash();
-            document.getElementById('gas-desc').value = ''; document.getElementById('gas-monto').value = '';
-            showTab('dashboard');
-        }
-        
-        function renderReportes() {
-            const c = document.getElementById('reporte-mensual-container'); c.innerHTML = '';
-            const ms = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const stats = {};
-            facturas.forEach(f => { const m = ms[new Date(f.fechaObj).getMonth()]; if(!stats[m]) stats[m] = { v: 0, g: 0 }; stats[m].v += f.pagado; });
-            gastos.forEach(g => { const m = ms[new Date(g.fechaObj).getMonth()]; if(!stats[m]) stats[m] = { v: 0, g: 0 }; stats[m].g += g.m; });
-            for (let m in stats) c.innerHTML += `<div class="card grid grid-cols-4 items-center shadow-lg border-l-4 border-cyan-600">
-                <span class="font-bold accent-chercha text-lg uppercase italic">${m}</span>
-                <div class="text-center font-bold text-green-400">Ventas: $${stats[m].v.toFixed(2)}</div>
-                <div class="text-center font-bold text-red-400">Gastos: $${stats[m].g.toFixed(2)}</div>
-                <div class="text-center font-black italic text-xl">Utilidad: $${(stats[m].v - stats[m].g).toFixed(2)}</div>
-            </div>`;
-        }
-
-        function renderProduccion() {
-            const p = document.getElementById('prod-pendiente'); const e = document.getElementById('prod-edicion'); const l = document.getElementById('prod-listo');
-            p.innerHTML = ''; e.innerHTML = ''; l.innerHTML = '';
-            facturas.forEach(f => {
-                const c = `<div class="bg-slate-800 p-3 rounded-xl border border-slate-700 relative shadow-md">
-                    <span class="text-[8px] bg-slate-900 px-1 rounded absolute top-2 right-2 text-slate-500">${f.ncf}</span>
-                    <p class="font-bold text-[10px] uppercase italic mb-1">${f.cliente}</p>
-                    <button onclick="moveStep('${f.ncf}')" class="w-full bg-slate-700 text-[9px] py-1 rounded mt-2 hover:bg-slate-600">Siguiente →</button>
-                </div>`;
-                if(f.estadoProd === 'pendiente') p.innerHTML += c; if(f.estadoProd === 'edicion') e.innerHTML += c; if(f.estadoProd === 'listo') l.innerHTML += c;
+        function exportToPDF() { const e = document.getElementById('factura-pdf'); html2pdf().set({ margin: 0, filename: `Factura_LCS_${document.getElementById('f-ncf').innerText}.pdf`, html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(e).save(); }
+        function closeFactura() { document.getElementById('modal-factura').classList.add('hidden'); }
+        function renderFacturas() {
+            const b = document.getElementById('lista-facturas-body'); b.innerHTML = '';
+            db.facturas.slice().reverse().forEach(f => {
+                b.innerHTML += `<tr class="border-b border-slate-800"><td class="p-3 font-bold accent-chercha">${f.ncf}</td><td class="p-3 uppercase font-bold">${f.cliente}<br><span class="text-[8px] font-normal italic">${f.fecha}</span></td><td class="p-3 text-red-500 font-bold">$${f.deuda.toFixed(2)}</td><td class="p-3 text-[9px] uppercase">${f.estatusEntrega}</td><td class="p-3 text-center flex gap-1 justify-center"><button onclick="reimprimir('${f.ncf}')" class="bg-slate-700 p-2 rounded text-blue-400"><i class="fas fa-file-pdf"></i></button><button onclick="expV('${f.ncf}')" class="bg-slate-700 p-2 rounded text-green-400"><i class="fas fa-user-plus"></i></button></td></tr>`;
             });
         }
-        function moveStep(ncf) {
-            let f = facturas.find(i => i.ncf === ncf);
-            if(f.estadoProd === 'pendiente') f.estadoProd = 'edicion'; else if(f.estadoProd === 'edicion') f.estadoProd = 'listo';
-            saveAll(); renderProduccion();
+        function expV(n) { const f=db.facturas.find(i=>i.ncf===n),t=prompt("Numero:"); const v=`BEGIN:VCARD\nFN:${f.cliente}\nTEL:${t}\nEND:VCARD`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([v],{type:'text/vcard'})); a.download=`${f.cliente}.vcf`; a.click(); }
+        function reimprimir(ncf) { showFacturaModal(db.facturas.find(i => i.ncf === ncf)); }
+        function updateDash() {
+            const i = db.facturas.reduce((a, b) => a + b.pagado, 0), d = db.facturas.reduce((a, b) => a + b.deuda, 0);
+            document.getElementById('dash-ingresos').innerText = `$ ${i.toFixed(2)}`; document.getElementById('dash-deuda').innerText = `$ ${d.toFixed(2)}`;
         }
+        function exportData() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(localStorage)],{type:'application/json'})); a.download='backup.json'; a.click(); }
+        function resetSystem() { if(confirm("Borrar todo?")) { localStorage.clear(); location.reload(); } }
+        function saveCita() { const n=document.getElementById('age-nombre').value, f=document.getElementById('age-fecha').value, h=document.getElementById('age-hora').value; if(!n||!f) return; db.citas.push({n,f,h}); save(); renderCitas(); window.open(`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(n)}&dates=${f.replaceAll('-','')}T${h.replace(':','')}00`, '_blank'); }
+        function renderCitas() { const l=document.getElementById('lista-citas'); l.innerHTML=''; db.citas.forEach(c => l.innerHTML+=`<div class="bg-slate-800 p-2 rounded-lg text-[10px] flex justify-between"><span>${c.n}</span><span class="text-slate-500">${c.f}</span></div>`); }
+        function saveInventory() { const i=document.getElementById('inv-item').value, s=document.getElementById('inv-stock').value; db.inventario.push({item:i, stock:s}); save(); renderI(); }
+        function renderI() { const b=document.getElementById('lista-inventario'); b.innerHTML=''; db.inventario.forEach(i=>b.innerHTML+=`<tr class="border-b border-slate-800"><td class="p-3">${i.item}</td><td class="p-3">${i.stock}</td></tr>`); }
 
-        renderCatalogPOS();
-        updateDash();
+        function init() { renderCatalogPOS(); renderCitas(); renderI(); updateDash(); loadSettings(); }
     </script>
 </body>
 </html>
